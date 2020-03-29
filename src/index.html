@@ -8,14 +8,13 @@
 </head>
 
 <body>
-  <div class="container bg-dark">
+  <section id="main" class="container bg-light">
     <div class="row">
-      <div class="col-12 bg-light">
+      <div class="col-12">
         <h3>COVID-19 Infections by State</h3>
         <div class="alert alert-danger d-none" id="error"></div> 
         <div><label>State: </label>
           <select id="theState">
-            <option value="">Select One...</option>
             <option value="AL">Alabama</option>
             <option value="AK">Alaska</option>
             <option value="AZ">Arizona</option>
@@ -71,15 +70,16 @@
             <option value="GU">Guam</option>
             <option value="MP">Northern Mariana Islands</option>
             <option value="PR">Puerto Rico</option>
-            <option value="UM">United States Minor Outlying Islands</option>
             <option value="VI">Virgin Islands</option>    
           </select>
         </div>
         <canvas id="theChart"></canvas>
+        <p>Share these results with this url: <a href="" id="theLink"></a></p>
         <p>Data courtesy of <a href="https://covidtracking.com">Covid Tracking Project</a>.</p>
+        <p class="small text-right">v0.2.1</p>
       </div>
     </div>
-  </div>
+  </section>
   <script src="dist/main.js"></script>
 </body>
 

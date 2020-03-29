@@ -1,18 +1,29 @@
 import "jquery";
 import "bootstrap";
-import "../css/site.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "../css/site.css";
 
 import {
   Chart
 } from "chart.js"
 import axios from "axios";
 
-let _rawData, _stateCombo, _chart = null;
+let _stateData, _stateCombo, _chart = null;
+let rootUrl = "https://covidstates.azurewebsites.net/"
 
 function createChart(state) {
   console.log("Creating Chart");
   let generated = generateData(state);
+  let subtitle = "Current Numbers: ";
+  function shouldShow(value, key) {
+    return value && value[key];
+  }
+  function showPercentage(value) {
+    return isFinite(value) ? ` (${value}%)` : "" ;
+  }
+  if (shouldShow(generated.current, "infections")) subtitle += `infected: ${generated.current.infections}${showPercentage(generated.current.infectionsPercent)} `;
+  if (shouldShow(generated.current, "hospitalized")) subtitle += `hospitalized: ${generated.current.hospitalized}${showPercentage(generated.current.hospitalizedPercent)} `;
+  if (shouldShow(generated.current, "deaths")) subtitle += `deaths: ${generated.current.deaths}${showPercentage(generated.current.deathsPercent)}`;
   if (_chart) _chart.destroy();
   _chart = new Chart("theChart", {
     data: {
@@ -39,9 +50,14 @@ function createChart(state) {
     },
     type: "line",
     options: {
+      animation: false,
       title: {
         display: true,
-        text: "COVID-19 Infection Rates for " + _stateCombo.options[_stateCombo.selectedIndex].innerText,
+        text: [
+          "Infection Rates for " + _stateCombo.options[_stateCombo.selectedIndex].innerText,
+          `As of: ${generated.current.lastDate}`,
+          subtitle
+        ],
         fontSize: 18,
         fontStyle: "Bold"
       },
@@ -63,6 +79,12 @@ function createChart(state) {
       }
     }
   });
+
+  let link = document.getElementById("theLink");
+  if (link) {
+    link.href = `${rootUrl}?state=${state}`;
+    link.innerText = `${rootUrl}?state=${state}`
+  }
 }
 
 function formatDate(date) {
@@ -70,13 +92,23 @@ function formatDate(date) {
   return theDate.substring(0, 4) + "-" + theDate.substring(4, 6) + "-" + theDate.substring(6, 8);
 }
 
+function categorizeData(rawData) {
+  _stateData = rawData.reduce((map, obj) => {
+    if (map[obj.state]) map[obj.state].push(obj);
+    else map[obj.state] = [obj];
+    return map;
+  }, {});
+  for (let item in _stateData) {
+    _stateData[item].sort((a, b) => {
+      if (a.date < b.date) return -1;
+      if (a.date > b.date) return 1;
+      return 0;
+    })
+  }
+}
+
 function generateData(state) {
-  let stateData = _rawData.filter(d => d.state == state);
-  stateData.sort((a,b) => {
-    if (a == b) return 0;
-    if (a < b) return 1;
-    return -1
-  });
+  let stateData = _stateData[state]
   let infected = stateData.map(d => d.positive);
   let hospitalized = stateData.map(d => d.hospitalized);
   let dead = stateData.map(d => d.death);
@@ -84,30 +116,78 @@ function generateData(state) {
     return a > 0 ? (d.infected - a[i - 1]) / a[i - 1] : 0.0;
   });
   let labels = stateData.map(d => formatDate(d.date));
+  let current = {
+    infections: infected[infected.length - 1],
+    infectionsPercent: calcPercentage(infected),
+    hospitalized: hospitalized[hospitalized.length - 1],
+    hospitalizedPercent: calcPercentage(hospitalized),
+    deaths: dead[dead.length - 1],
+    deathsPercent: calcPercentage(dead),
+    lastDate: labels[labels.length - 1]
+  };
+
   return {
     infected,
     hospitalized,
     dead,
     dailyChanges,
-    labels
+    labels,
+    current
   };
 }
 
-async function init() {
+function calcPercentage(coll) {
+  return (((coll[coll.length - 1] - coll[coll.length - 2]) / coll[coll.length - 2]) * 100).toFixed(2);
+}
+
+function getUrlParameter(name) {
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+  var results = regex.exec(location.search);
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+function init() {
   _stateCombo = document.getElementById("theState");
   _stateCombo.addEventListener("change", e => {
     if (_stateCombo.value) {
       createChart(_stateCombo.value);
     }
   });
-  let result = await axios.get("https://covidtracking.com/api/states/daily");
-  if (result.status == 200) {
-    _rawData = result.data;
-  } else {
-    let errorBlock = document.getElementById("error");
-    errorBlock.innerText = "Failed to load data...";
-    errorBlock.style = "display: block;";
-  }
+  axios.get("https://covidtracking.com/api/states/daily")
+    .then(result => {
+      if (result.status == 200) {
+        categorizeData(result.data);
+        let stateParam = getUrlParameter("state");
+        if (!stateParam) {
+          let largest = "";
+          for (let key in _stateData) {
+            if (!largest) largest = key;
+            else {
+              let currentLast = lastItem(_stateData[key]);
+              let biggest = lastItem(_stateData[largest]);
+              if (currentLast.positive > biggest.positive) {
+                largest = key;
+              }
+            }
+          }
+          stateParam = largest;
+        }
+        _stateCombo.value = stateParam;
+        createChart(stateParam);
+      }
+    }).catch(e => {
+      let errorBlock = document.getElementById("error");
+      errorBlock.innerText = "Failed to load data...";
+      errorBlock.style = "display: block;";
+    });
 }
-1
+
+function lastItem(arr) {
+  if (arr) {
+    return arr[arr.length - 1];
+  }
+  return null;
+}
+
 init();

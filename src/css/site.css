@@ -1,0 +1,13 @@
+body {
+  background-color: #444;
+}
+
+section {
+  min-height: 100vh;
+}
+
+@media (min-width: 760px) {
+  section {
+    min-height: 50vh;
+  }
+}
