@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 
 let _stateData, _stateCombo, _chart = null;
-let rootUrl = "https://covidstates.azurewebsites.net/"
+let rootUrl = "https://covidstates.azurewebsites.net/";
 
 function createChart(state) {
   console.log("Creating Chart");
@@ -158,8 +158,8 @@ function init() {
     .then(result => {
       if (result.status == 200) {
         categorizeData(result.data);
-        let stateParam = getUrlParameter("state");
-        if (!stateParam) {
+        let stateParam = getUrlParameter("state").toUpperCase();
+        if (!stateParam || !_stateData[stateParam]) {
           let largest = "";
           for (let key in _stateData) {
             if (!largest) largest = key;

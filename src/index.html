@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Covid Infection Rate - Georgia</title>
+  <script>let ver = "0.2.4";</script>
 </head>
 
 <body>
@@ -76,11 +77,16 @@
         <canvas id="theChart"></canvas>
         <p>Share these results with this url: <a href="" id="theLink"></a></p>
         <p>Data courtesy of <a href="https://covidtracking.com">Covid Tracking Project</a>.</p>
-        <p class="small text-right">v0.2.1</p>
+        <p class="small text-right" id='version'></p>
       </div>
     </div>
   </section>
-  <script src="dist/main.js"></script>
+  <script>
+    document.getElementById("version").innerText = ver;
+    let main = document.createElement("script");
+    main.src = `dist/main.js?ver=${ver}`;
+    document.body.appendChild(main);
+  </script>
 </body>
 
 </html>
