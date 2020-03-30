@@ -1,9 +1,10 @@
 {
-  "name": "gacovid",
+  "name": "covidstates",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "host": "lite-server .",
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack --watch --config webpack.dev.js"
   },

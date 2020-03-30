@@ -12,7 +12,7 @@ function createChart(state) {
     return value && value[key];
   }
   function showPercentage(value) {
-    return isFinite(value) ? ` (${value}%)` : "" ;
+    return isFinite(value) ? ` (*${value}%)` : "" ;
   }
   if (shouldShow(generated.current, "infections")) subtitle += `infected: ${generated.current.infections}${showPercentage(generated.current.infectionsPercent)} `;
   if (shouldShow(generated.current, "hospitalized")) subtitle += `hospitalized: ${generated.current.hospitalized}${showPercentage(generated.current.hospitalizedPercent)} `;

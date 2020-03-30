@@ -2,12 +2,15 @@ module.exports = {
   mode: "development",
   entry: {
     "main": "./js",
-    "libs": "./js/libs"
+    "libs": "./js/libs",
+    "css": "./js/css"
   },
-  devtool: 'inline-source-map',  
+  performance: {
+    hints: false
+  },
+  devtool: 'inline-source-map',
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
@@ -19,7 +22,8 @@ module.exports = {
           options: {
             presets: ['@babel/preset-env']
           }
-        }      }
+        }
+      }
     ],
   },
 };

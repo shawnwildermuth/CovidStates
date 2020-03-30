@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Covid Infection Rate Graphs</title>
-  <script>let ver = "0.2.5";</script>
+  <script src="dist/css.js"></script>
+  <script>let ver = "0.2.7";</script>
 </head>
 
 <body>
@@ -76,7 +77,8 @@
         </div>
         <canvas id="theChart"></canvas>
         <p>Share these results with this url: <a href="" id="theLink"></a></p>
-        <p>Data courtesy of <a href="https://covidtracking.com">Covid Tracking Project</a>.</p>
+        <p class="small">* Percentages reflect changes from the prior period. Not the % of the totals. </p>
+        <p class="small">Data courtesy of <a href="https://covidtracking.com">Covid Tracking Project</a>.</p>
         <p class="small text-right" id='version'></p>
       </div>
     </div>
