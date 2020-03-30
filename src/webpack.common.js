@@ -1,7 +1,8 @@
 module.exports = {
   mode: "development",
   entry: {
-    "main": "./js"
+    "main": "./js",
+    "libs": "./js/libs"
   },
   devtool: 'inline-source-map',  
   module: {

@@ -1,11 +1,4 @@
-import "jquery";
-import "bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import "../css/site.css";
-
-import {
-  Chart
-} from "chart.js"
+import { Chart } from "chart.js"
 import axios from "axios";
 
 let _stateData, _stateCombo, _chart = null;
